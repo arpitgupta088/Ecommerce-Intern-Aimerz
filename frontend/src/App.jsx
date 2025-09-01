@@ -18,7 +18,7 @@ function App() {
 
       <section className="max-w-7xl mx-auto px-4 py-12">
         <h2 className="text-2xl font-bold mb-6">Featured Products</h2>
-        {/* <ProductsGrid />  */} {/* Uncomment this line when ProductsGrid is ready */}
+        <ProductsGrid />  
       </section>
 
       {/* Login/Signup Section */}
