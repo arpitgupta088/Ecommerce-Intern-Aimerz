@@ -1,10 +1,10 @@
 import React from "react";
 
 const categories = [
-  { id: 1, name: "Mobiles", image: "" },
-  { id: 2, name: "Laptops", image: "" },
-  { id: 3, name: "Audio", image: "" },
-  { id: 4, name: "Accessories", image: "" },
+  { id: 1, name: "Mobiles", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8RVfbq-eMMWrFj-aYtRfvFOjONP-BQ2UEzQ&s" },
+  { id: 2, name: "Laptops", image: "https://cdn.mos.cms.futurecdn.net/xPYW4a73GxGBApFQeECW2h.jpg" },
+  { id: 3, name: "Audio", image: "https://images.summitmedia-digital.com/spotph/images/2021/07/09/save-vs-splurge-audio-devices-640-1625825582.jpg" },
+  { id: 4, name: "Accessories", image: "https://www.shutterstock.com/image-photo/smartphone-headphones-ebook-reader-other-260nw-1932016577.jpg" },
 ];
 
 const Categories = () => {
