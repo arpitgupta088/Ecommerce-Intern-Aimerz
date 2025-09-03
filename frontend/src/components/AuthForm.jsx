@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function AuthForm() {
   const [role, setRole] = useState("customer");
+  const navigate = useNavigate(); // navigation ke liye
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Role:", role);
     // yahan baad me backend ke sath api call add hoga
+    navigate("/");  // Login ke baad home page par redirect karne ke liye
   };
 
   return (
