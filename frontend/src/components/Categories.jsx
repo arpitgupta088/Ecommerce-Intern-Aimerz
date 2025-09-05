@@ -1,4 +1,4 @@
-import React from "react";
+import { Link } from "react-router-dom";
 
 const categories = [
   { id: 1, name: "Mobiles", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS8RVfbq-eMMWrFj-aYtRfvFOjONP-BQ2UEzQ&s" },
@@ -10,13 +10,17 @@ const categories = [
 const Categories = () => {
   return (
     <section className="py-10 px-6">
-      <h2 className="text-2xl font-bold mb-6">Shop by Categories</h2>
+      <h2 className="section-title">Shop by Categories</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         {categories.map((cat) => (
-          <div key={cat.id} className="border rounded-lg p-4 shadow hover:shadow-lg text-center">
-            <img src={cat.image} alt={cat.name} className="w-full h-32 object-cover rounded" />
+          <Link
+            key={cat.id}
+            to={`/category/${cat.id}`}
+            className="grid-item p-4 text-center block"
+          >
+            <img src={cat.image} alt={cat.name} className="w-full h-32 object-cover img-shadow" />
             <h3 className="mt-2 font-semibold">{cat.name}</h3>
-          </div>
+          </Link>
         ))}
       </div>
     </section>
