@@ -1,58 +1,110 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function AuthForm() {
+  const [isSignup, setIsSignup] = useState(false);
   const [role, setRole] = useState("customer");
-  const navigate = useNavigate(); // navigation ke liye
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Role:", role);
-    // yahan baad me backend ke sath api call add hoga
-    navigate("/");  // Login ke baad home page par redirect karne ke liye
+
+    try {
+      if (isSignup) {
+        // Signup API call
+        await axios.post("http://localhost:5000/api/auth/signup", {
+          email,
+          password,
+          role,
+        });
+        alert("Signup successful! Please login.");
+        setIsSignup(false);
+      } else {
+        // Login API call
+        const res = await axios.post("http://localhost:5000/api/auth/login", {
+          email,
+          password,
+          role,
+        });
+
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("role", role);
+
+        if (role === "admin") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Something went wrong!");
+    }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-md mx-auto bg-white shadow-lg rounded-lg p-6"
-    >
-      <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+    <div className="max-w-md mx-auto mt-20 bg-white shadow-2xl rounded-xl p-8">
+      
+      <div className="flex justify-center mb-6">
+        <button
+          className={`px-4 py-2 font-semibold ${
+            !isSignup ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-500"
+          }`}
+          onClick={() => setIsSignup(false)}
+        >
+          Login
+        </button>
+        <button
+          className={`px-4 py-2 font-semibold ${
+            isSignup ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-500"
+          }`}
+          onClick={() => setIsSignup(true)}
+        >
+          Signup
+        </button>
+      </div>
 
-      {/* Role Selection */}
-      <label className="block mb-2 font-semibold">Login as</label>
-      <select
-        value={role}
-        onChange={(e) => setRole(e.target.value)}
-        className="w-full border p-2 rounded mb-4"
-      >
-        <option value="customer">Customer</option>
-        <option value="admin">Admin</option>
-      </select>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Role Selection */}
+        <div>
+          <label className="block mb-1 font-semibold">Login as</label>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full border p-2 rounded focus:ring focus:ring-blue-200"
+          >
+            <option value="customer">Customer</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
 
-      {/* Email */}
-      <input
-        type="email"
-        placeholder="Email"
-        className="w-full border p-2 rounded mb-4"
-        required
-      />
-
-      {/* Password */}
-      <input
-        type="password"
-        placeholder="Password"
-        className="w-full border p-2 rounded mb-4"
-        required
-      />
-
-      <button
-        type="submit"
-        className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-      >
-        Login
-      </button>
-    </form>
+        
+        <input
+          type="email"
+          placeholder="Email"
+          className="w-full border p-2 rounded focus:ring focus:ring-blue-200"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          className="w-full border p-2 rounded focus:ring focus:ring-blue-200"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button
+          type="submit"
+          className="w-full bg-gradient-to-r from-blue-600 to-blue-400 text-white p-2 rounded-lg hover:opacity-90 transition"
+        >
+          {isSignup ? "Signup" : "Login"}
+        </button>
+      </form>
+    </div>
   );
 }
 

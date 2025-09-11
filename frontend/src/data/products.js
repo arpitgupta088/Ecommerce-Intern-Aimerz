@@ -23,6 +23,30 @@ const products = [
     name: "Dell XPS 15 Laptop",
     price: 119999,
     image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8"
+  },
+  {
+    id: 5,
+    name: "Apple Watch Series 9",
+    price: 41999,
+    image: "https://www.aptronixindia.com/media/catalog/product/cache/31f0162e6f7d821d2237f39577122a8a/g/o/gold_stainless_steel_gold_milanese_loop_pdp_image_position-1__en-us.jpeg"
+  },
+  {
+    id: 6,
+    name: "Canon EOS 1500D DSLR Camera",
+    price: 35999,
+    image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308"
+  },
+  {
+    id: 7,
+    name: "Bose SoundLink Revolve+ Bluetooth Speaker",
+    price: 19999,
+    image: "https://img.tatacliq.com/images/i19//1348Wx2000H/MP000000023561136_1348Wx2000H_202409070049242.jpeg"
+  },
+  {
+    id: 8,
+    name: "Samsung 27-inch Curved Monitor",
+    price: 17999,
+    image: "https://www.primeabgb.com/wp-content/uploads/2023/10/Samsung-27-inch-Curved-Full-HD-Monitor-with-1800R-1.jpg"
   }
 ];
 

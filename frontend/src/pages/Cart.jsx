@@ -1,50 +1,144 @@
+import { useEffect, useState } from "react";
+import { getCart } from "../api/cartApi";
 import { Link } from "react-router-dom";
 
-export default function Cart() {
+export default function Cart({ token }) {
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        let backendCart = [];
+        if (token) {
+          const data = await getCart(token);
+          backendCart = data.items.map((item) => ({
+            _id: item.product._id,
+            name: item.product.name,
+            price: item.product.price,
+            image: item.product.image,
+            quantity: item.quantity,
+            source: "db",
+          }));
+        }
+
+        let localCart = JSON.parse(localStorage.getItem("localCart")) || [];
+        localCart = localCart.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          image: item.image,
+          quantity: item.quantity || 1,
+          source: "local",
+        }));
+
+        setCartItems([...localCart, ...backendCart]);
+      } catch (err) {
+        console.error("Error fetching cart:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCart();
+  }, [token]);
+
+  if (loading) return <p className="p-6">Loading...</p>;
+
+  // Quantity update button lgaya h
+  const updateQuantity = (index, change) => {
+    setCartItems((prev) => {
+      const updated = [...prev];
+      const newQty = updated[index].quantity + change;
+      if (newQty > 0) {
+        updated[index].quantity = newQty;
+      }
+      return updated;
+    });
+  };
+
+  // Subtotal calculation
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity, 0
+  );
+
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="section-title mb-6">Cart</h1>
-      <div className="space-y-4">
-        {/* Example Cart Item */}
-        <div className="flex items-center justify-between card">
-          <img
-            src="https://via.placeholder.com/100"
-            alt="product"
-            className="w-20 h-20 rounded img-shadow"
-          />
-          <p className="flex-1 ml-4">Product Name</p>
-          <div className="flex items-center space-x-2">
-            <button className="btn btn-outline px-2">-</button>
-            <span>1</span>
-            <button className="btn btn-outline px-2">+</button>
+    <div className="max-w-3xl mx-auto p-6">
+      <h2 className="section-title mb-6 text-center">Your Cart</h2>
+      {cartItems.length === 0 ? (
+        <p className="text-center text-gray-600">No items in cart</p>
+      ) : (
+        <div>
+          {/* Items List */}
+          <div className="space-y-4">
+            {cartItems.map((item, index) => (
+              <div
+                key={item._id || item.id || index}
+                className="flex items-center border p-4 rounded-lg shadow-md bg-white justify-between"
+              >
+                <div className="flex items-center">
+                  <img
+                    src={item.image || "https://via.placeholder.com/100"}
+                    alt={item.name}
+                    className="w-20 h-20 rounded-lg object-cover shadow"
+                  />
+                  <div className="ml-4">
+                    <p className="font-semibold text-lg">{item.name}</p>
+                    <p className="text-blue-600 font-bold">₹{item.price}</p>
+                  </div>
+                </div>
+
+                {/* Quantity Controls */}
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => updateQuantity(index, -1)}
+                    className="px-2 py-1 border rounded"
+                  >
+                    -
+                  </button>
+                  <span className="px-3">{item.quantity}</span>
+                  <button
+                    onClick={() => updateQuantity(index, 1)}
+                    className="px-2 py-1 border rounded"
+                  >
+                    +
+                  </button>
+                </div>
+
+                {/* Total per item */}
+                <p className="font-bold w-20 text-right">
+                  ₹{item.price * item.quantity}
+                </p>
+              </div>
+            ))}
           </div>
-          <p className="font-semibold">₹999</p>
+
+          {/* Summary Section */}
+          <div className="mt-8 border-t pt-4">
+            <p className="flex justify-between mb-2 text-lg">
+              <span>Subtotal</span>
+              <span>₹{subtotal}</span>
+            </p>
+            <p className="flex justify-between font-bold text-xl mb-4">
+              <span>Total</span>
+              <span>₹{subtotal}</span>
+            </p>
+
+            <div className="flex flex-col space-y-3">
+              <Link to="/checkout">
+                <button className="btn btn-primary w-full">
+                  Proceed to Checkout
+                </button>
+              </Link>
+              <Link to="/">
+                <button className="btn w-full bg-gray-200 hover:bg-gray-300">
+                  Continue Shopping
+                </button>
+              </Link>
+            </div>
+          </div>
         </div>
-      </div>
-
-      <div className="mt-6 card">
-        <p className="flex justify-between">
-          <span>Subtotal</span>
-          <span>₹1998</span>
-        </p>
-        <p className="flex justify-between">
-          <span>Shipping</span>
-          <span>Free</span>
-        </p>
-        <p className="flex justify-between font-bold text-lg">
-          <span>Total</span>
-          <span>₹1998</span>
-        </p>
-      </div>
-
-      <div className="flex justify-between mt-6">
-        <Link to="/">
-          <button className="btn btn-outline">Continue Shopping</button>
-        </Link>
-        <Link to="/checkout">
-          <button className="btn btn-primary">Proceed to Checkout</button>
-        </Link>
-      </div>
+      )}
     </div>
   );
 }

@@ -1,41 +1,115 @@
-import { useParams, Link } from "react-router-dom";
-import products from "../data/products";
-
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import productsData from "../data/products";
+import { addToCart } from "../api/cartApi";
 
 export default function ProductDetails() {
   const { id } = useParams();
-  const product = products.find((p) => p.id === parseInt(id));
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!product) return <h2 className="text-center mt-10">Product Not Found</h2>;
+  useEffect(() => {
+    const fetchProduct = async () => {
+      let found = productsData.find((p) => String(p.id) === String(id));
+      if (found) {
+        setProduct(found);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const res = await axios.get(`http://localhost:5000/api/products/${id}`);
+        setProduct(res.data);
+      } catch (err) {
+        console.error("Error fetching product details", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  const handleAddToCart = async () => {
+    try {
+      // Dummy product ka case
+      if (!product._id && product.id) {
+        let localCart = JSON.parse(localStorage.getItem("localCart")) || [];
+        const exists = localCart.find((item) => item.id === product.id);
+
+        if (exists) {
+          exists.quantity += 1;
+        } else {
+          localCart.push({ ...product, quantity: 1 });
+        }
+
+        localStorage.setItem("localCart", JSON.stringify(localCart));
+        alert(" Item added to cart (dummy)");
+        return;
+      }
+
+      // DB product ka case
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Please login to add items to cart!");
+        return;
+      }
+
+      await addToCart(product._id, 1, token);
+      alert(" Item added to cart (DB)");
+    } catch (err) {
+      console.error(err);
+      alert(" Failed to add item to cart.");
+    }
+  };
+
+  if (loading) return <p className="p-6">Loading...</p>;
+  if (!product) return <p className="p-6">Product not found</p>;
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-      <div className="grid md:grid-cols-2 gap-6 card">
-        <img src={product.image} alt={product.name} className="img-shadow" />
-        <div>
-          <h1 className="text-2xl font-bold">{product.name}</h1>
-          <p className="text-lg text-blue-700 font-semibold">₹{product.price}</p>
-          <button className="btn btn-primary mt-4">
-            Add to Cart
-          </button>
-          <h2 className="mt-6 font-semibold">Product Details</h2>
-          <p className="text-gray-600 mt-2">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel sapien at odio tristique.
-          </p>
+      <div className="grid md:grid-cols-2 gap-8 card shadow-2xl bg-white/90 backdrop-blur-lg">
+        <div className="flex flex-col items-center">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="img-shadow w-full max-w-xs h-80 object-cover rounded-xl mb-4"
+          />
+          <span className="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full shadow mt-2">
+            #{product.category || "Gadget"}
+          </span>
         </div>
-      </div>
 
-      {/* Related Products */}
-      <h2 className="mt-10 section-title text-lg">Related Products</h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-        {products.slice(0, 4).map((p) => (
-          <Link key={p.id} to={`/product/${p.id}`}>
-            <div className="grid-item p-3 text-center">
-              <img src={p.image} alt={p.name} className="w-full h-32 object-cover img-shadow" />
-              <p className="mt-2 font-semibold text-blue-700">₹{p.price}</p>
-            </div>
-          </Link>
-        ))}
+        <div className="flex flex-col justify-center">
+          <h1 className="text-3xl font-extrabold mb-2 text-blue-800">
+            {product.name}
+          </h1>
+          <p className="text-2xl text-blue-600 font-bold mb-4">
+            ₹{product.price}
+          </p>
+          <p className="mb-6 text-gray-700">
+            {product.description ||
+              "Experience the best quality and latest technology with this amazing gadget. Perfect for your needs and lifestyle."}
+          </p>
+          <button
+            onClick={handleAddToCart}
+            className="btn btn-primary px-8 py-3 text-lg rounded-full shadow-lg hover:scale-105 hover:bg-blue-700 transition-all duration-200"
+          >
+            🛒 Add to Cart
+          </button>
+          <div className="mt-8">
+            <h2 className="font-semibold text-lg mb-2 text-blue-700">
+              Product Details
+            </h2>
+            <ul className="list-disc list-inside text-gray-600 space-y-1">
+              <li>High quality &amp; durable</li>
+              <li>1 year warranty</li>
+              <li>Fast delivery</li>
+              <li>Easy returns</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );
