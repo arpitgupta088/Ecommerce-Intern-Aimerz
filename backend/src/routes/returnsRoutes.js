@@ -19,7 +19,7 @@ router.post("/", verifyUser, async (req, res) => {
   }
 });
 
-// Admin: Approve or Reject karega
+// Admin Approve or Reject karega
 router.patch("/:id", verifyAdmin, async (req, res) => {
   try {
     const { status } = req.body; // "Approved" or "Rejected"
