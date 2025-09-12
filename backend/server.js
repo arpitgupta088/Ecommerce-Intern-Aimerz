@@ -32,6 +32,10 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", require("./src/routes/authRoutes"));
 app.use("/api/returns", require("./src/routes/returnsRoutes"));
+app.use("/api/cart", require("./src/routes/cartRoutes"));
+app.use("/api/products", require("./src/routes/productRoutes"));
+
+
 
 // Database and server connect kiya
 connectDB();
