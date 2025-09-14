@@ -9,8 +9,10 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import ProductDetails from "./pages/ProductDetails";
 import Footer from "./components/Footer";
+import MyOrders from "./pages/MyOrders";
 
 function App() {
+  const token = localStorage.getItem("token"); 
   return (
     <Router>
       <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -36,8 +38,10 @@ function App() {
             {/* Login Page */}
             <Route path="/login" element={<Login />} />
             <Route path="/cart" element={<Cart />} />
-            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/checkout" element={<Checkout token={token} />} />
             <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/myorders" element={<MyOrders token={token} />} />
+            
           </Routes>
         </div>
 
