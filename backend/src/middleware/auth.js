@@ -1,36 +1,43 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
 
-// Verify JWT for normal user
+// ✅ Verify JWT for normal user
 const verifyUser = (req, res, next) => {
-  const token = req.headers["authorization"]?.split(" ")[1]; // Bearer token
+  const token = req.headers["authorization"]?.split(" ")[1]; // "Bearer <token>"
   if (!token) return res.status(401).json({ message: "No token provided" });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+// console.log("decoded token:", decoded)
+
+    req.user = { id: decoded.id || decoded._id, role: decoded.role };
+
     next();
   } catch (err) {
-    res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
 
-// Verify JWT + check admin role
+// ✅ Verify JWT + check admin role
 const verifyAdmin = (req, res, next) => {
   const token = req.headers["authorization"]?.split(" ")[1];
   if (!token) return res.status(401).json({ message: "No token provided" });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded.role !== "admin") return res.status(403).json({ message: "Not authorized" });
-    req.user = decoded;
+
+    if (decoded.role !== "admin") {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    req.user = { id: decoded.id || decoded._id, role: decoded.role };
+
     next();
   } catch (err) {
-    res.status(401).json({ message: "Invalid token" });
+    return res.status(401).json({ message: "Invalid token" });
   }
 };
 
-// Error handler
+// ✅ Error handler (optional global use)
 const errorHandler = (err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode);

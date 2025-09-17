@@ -1,7 +1,7 @@
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
 
-// Get cart of logged in user
+// Get cart of logged-in user
 exports.getCart = async (req, res) => {
   try {
     const cart = await Cart.findOne({ user: req.user.id }).populate("items.product");
@@ -16,6 +16,9 @@ exports.getCart = async (req, res) => {
 exports.addToCart = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
+    if(!productId){
+      return res.status(400).json({message:" Product ID is required"});
+    }
 
     let cart = await Cart.findOne({ user: req.user.id });
     if (!cart) {
@@ -31,13 +34,17 @@ exports.addToCart = async (req, res) => {
     }
 
     await cart.save();
+    await cart.populate("items.product"); 
+
+    console.log("saved cart", cart);
     res.status(201).json(cart);
   } catch (err) {
+    console.error("Error in addToCart:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// Remove item from cart
+//  Remove item
 exports.removeFromCart = async (req, res) => {
   try {
     const { productId } = req.body;
@@ -47,13 +54,14 @@ exports.removeFromCart = async (req, res) => {
     cart.items = cart.items.filter(i => i.product.toString() !== productId);
 
     await cart.save();
+    await cart.populate("items.product");
     res.json(cart);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// Update item quantity
+// Update quantity
 exports.updateQuantity = async (req, res) => {
   try {
     const { productId, quantity } = req.body;
@@ -65,6 +73,7 @@ exports.updateQuantity = async (req, res) => {
 
     cart.items[itemIndex].quantity = quantity;
     await cart.save();
+    await cart.populate("items.product");
 
     res.json(cart);
   } catch (err) {

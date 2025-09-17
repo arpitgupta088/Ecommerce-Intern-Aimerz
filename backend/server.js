@@ -4,6 +4,10 @@ const cors = require("cors");
 const passport = require("./src/config/passport");
 const session = require("express-session");
 const connectDB = require("./src/config/db");
+const cartRoutes = require("./src/routes/cartRoutes");
+
+
+
 
 const app = express();
 
@@ -32,8 +36,10 @@ app.get("/", (req, res) => {
 
 app.use("/api/auth", require("./src/routes/authRoutes"));
 app.use("/api/returns", require("./src/routes/returnsRoutes"));
-app.use("/api/cart", require("./src/routes/cartRoutes"));
+app.use("/api/cart", cartRoutes);
 app.use("/api/products", require("./src/routes/productRoutes"));
+app.use("/api/orders", require("./src/routes/orderRoutes"));
+
 
 
 
