@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getCart } from "../api/cartApi";
+import { getCart, removeFromCart } from "../api/cartApi";
 import { Link } from "react-router-dom";
 
 export default function Cart({ token }) {
@@ -45,7 +45,7 @@ export default function Cart({ token }) {
 
   if (loading) return <p className="p-6">Loading...</p>;
 
-  // Quantity update button lgaya h
+  // Quantity update button
   const updateQuantity = (index, change) => {
     setCartItems((prev) => {
       const updated = [...prev];
@@ -57,9 +57,29 @@ export default function Cart({ token }) {
     });
   };
 
+  // 🟢 Remove from cart (local + backend)
+  const handleRemove = async (item, index) => {
+    try {
+      if (item.source === "db" && token) {
+        await removeFromCart(item._id, token);
+      } else {
+        // Local cart removal
+        let localCart = JSON.parse(localStorage.getItem("localCart")) || [];
+        localCart = localCart.filter((p) => p.id !== item.id);
+        localStorage.setItem("localCart", JSON.stringify(localCart));
+      }
+
+      // Update UI
+      setCartItems((prev) => prev.filter((_, i) => i !== index));
+    } catch (err) {
+      console.error("Error removing item:", err);
+    }
+  };
+
   // Subtotal calculation
   const subtotal = cartItems.reduce(
-    (acc, item) => acc + item.price * item.quantity, 0
+    (acc, item) => acc + item.price * item.quantity,
+    0
   );
 
   return (
@@ -109,6 +129,14 @@ export default function Cart({ token }) {
                 <p className="font-bold w-20 text-right">
                   ₹{item.price * item.quantity}
                 </p>
+
+                {/* Remove button */}
+                <button
+                  onClick={() => handleRemove(item, index)}
+                  className="ml-4 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Remove
+                </button>
               </div>
             ))}
           </div>
