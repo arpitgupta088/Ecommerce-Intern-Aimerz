@@ -15,10 +15,14 @@ const Categories = () => {
         {categories.map((cat) => (
           <Link
             key={cat.id}
-            to={`/category/${cat.id}`}
-            className="grid-item p-4 text-center block"
+            to={`/category/${cat.name}`}   // ✅ yaha id ke jagah name bhejna h
+            className="grid-item p-4 text-center block hover:scale-105 transition-transform duration-200"
           >
-            <img src={cat.image} alt={cat.name} className="w-full h-32 object-cover img-shadow" />
+            <img
+              src={cat.image}
+              alt={cat.name}
+              className="w-full h-32 object-cover img-shadow rounded-lg"
+            />
             <h3 className="mt-2 font-semibold">{cat.name}</h3>
           </Link>
         ))}

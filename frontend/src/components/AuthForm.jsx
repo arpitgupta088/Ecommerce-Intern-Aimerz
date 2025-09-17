@@ -29,8 +29,11 @@ function AuthForm() {
           password,
           role,
         });
+console.log("Login response:", res.data);
 
         localStorage.setItem("token", res.data.token);
+        console.log("Token saved:", res.data.token);
+        console.log(localStorage.getItem("token"));
         localStorage.setItem("role", role);
 
         if (role === "admin") {

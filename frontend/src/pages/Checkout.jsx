@@ -5,7 +5,7 @@ import { placeOrder } from "../api/orderApi";
 
 export default function Checkout({ token }) {
   const navigate = useNavigate();
-  const [cart, setCart] = useState(null);
+  const [cart, setCart] = useState({ items: [] });
   const [subtotal, setSubtotal] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [shippingAddress, setShippingAddress] = useState({
@@ -19,22 +19,75 @@ export default function Checkout({ token }) {
     const fetchCart = async () => {
       try {
         const data = await getCart(token);
-        console.log("CART RESPONSE:", data);
+        console.log("🟢 CART RESPONSE (Backend):", data);
 
-        if (data && data.items) {
-          setCart(data); // ✅ cart ko state me store karo
-          const totalAmount = data.items.reduce(
-            (acc, item) => acc + item.product.price * item.quantity,
-            0
-          );
-          setSubtotal(totalAmount);
-        } else {
-          console.log("⚠️ Cart is empty ya wrong response format:", data);
-          setCart({ items: [] }); // empty cart safe fallback
+        let mergedItems = [];
+
+        // ✅ Backend cart (agar hai to use lo)
+        if (data && data.items && data.items.length > 0) {
+          mergedItems = [
+            ...mergedItems,
+            ...data.items.map((item) => ({
+              product: {
+                _id: item.product._id,
+                name: item.product.name,
+                price: item.product.price,
+                image: item.product.image,
+              },
+              quantity: item.quantity,
+            })),
+          ];
         }
+
+        // ✅ Local cart (dummy products)
+        let localCart = JSON.parse(localStorage.getItem("localCart")) || [];
+        if (localCart.length > 0) {
+          console.log("🟡 Local Cart Found:", localCart);
+          mergedItems = [
+            ...mergedItems,
+            ...localCart.map((item) => ({
+              product: {
+                _id: item.id, // dummy id
+                name: item.name,
+                price: item.price,
+                image: item.image,
+              },
+              quantity: item.quantity,
+            })),
+          ];
+        }
+
+        // ✅ Subtotal calculate
+        const totalAmount = mergedItems.reduce(
+          (acc, item) => acc + item.product.price * item.quantity,
+          0
+        );
+
+        setCart({ items: mergedItems });
+        setSubtotal(totalAmount);
+
       } catch (error) {
-        console.error("Error fetching cart:", error);
-        setCart({ items: [] }); // error case me bhi fallback
+        console.error("❌ Error fetching cart:", error);
+
+        // Agar backend fail ho jaye to local cart hi dikhao
+        let localCart = JSON.parse(localStorage.getItem("localCart")) || [];
+        const mergedItems = localCart.map((item) => ({
+          product: {
+            _id: item.id,
+            name: item.name,
+            price: item.price,
+            image: item.image,
+          },
+          quantity: item.quantity,
+        }));
+
+        const totalAmount = mergedItems.reduce(
+          (acc, item) => acc + item.product.price * item.quantity,
+          0
+        );
+
+        setCart({ items: mergedItems });
+        setSubtotal(totalAmount);
       }
     };
 
@@ -62,7 +115,7 @@ export default function Checkout({ token }) {
     }
   };
 
-  if (!cart) return <p>Loading...</p>; // jab tak cart load ho raha hai
+  if (!cart || cart.items.length === 0) return <p>Your cart is empty.</p>;
 
   return (
     <div className="max-w-5xl mx-auto p-6">
@@ -111,28 +164,24 @@ export default function Checkout({ token }) {
         {/* Order Summary */}
         <div className="card">
           <h2 className="font-semibold mb-4">Order Summary</h2>
-          {cart.items.length === 0 ? (
-            <p>Your cart is empty.</p>
-          ) : (
-            cart.items.map((item) => (
-              <div
-                key={item.product._id}
-                className="flex items-center border p-3 rounded img-shadow bg-gray-50 mb-3"
-              >
-                <img
-                  src={item.product.image}
-                  alt={item.product.name}
-                  className="w-20 h-20 rounded img-shadow"
-                />
-                <div className="ml-4">
-                  <p>{item.product.name}</p>
-                  <p className="font-semibold">
-                    ₹{item.product.price} × {item.quantity}
-                  </p>
-                </div>
+          {cart.items.map((item, idx) => (
+            <div
+              key={idx}
+              className="flex items-center border p-3 rounded img-shadow bg-gray-50 mb-3"
+            >
+              <img
+                src={item.product.image}
+                alt={item.product.name}
+                className="w-20 h-20 rounded img-shadow"
+              />
+              <div className="ml-4">
+                <p>{item.product.name}</p>
+                <p className="font-semibold">
+                  ₹{item.product.price} × {item.quantity}
+                </p>
               </div>
-            ))
-          )}
+            </div>
+          ))}
 
           <div className="mt-4 space-y-2">
             <p className="flex justify-between">

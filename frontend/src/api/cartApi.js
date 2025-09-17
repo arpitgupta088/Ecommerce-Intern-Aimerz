@@ -5,7 +5,7 @@ const API_URL = "http://localhost:5000/api/cart";
 // Add product to cart
 export const addToCart = async (productId, quantity = 1, token) => {
   const res = await axios.post(
-    API_URL,
+    `${API_URL}/add`,
     { productId, quantity },
     {
       headers: { Authorization: `Bearer ${token}` },

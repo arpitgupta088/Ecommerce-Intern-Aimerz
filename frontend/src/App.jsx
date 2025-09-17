@@ -10,6 +10,7 @@ import Checkout from "./pages/Checkout";
 import ProductDetails from "./pages/ProductDetails";
 import Footer from "./components/Footer";
 import MyOrders from "./pages/MyOrders";
+import CategoryPage from "./pages/CategoryPage";
 
 function App() {
   const token = localStorage.getItem("token"); 
@@ -41,7 +42,8 @@ function App() {
             <Route path="/checkout" element={<Checkout token={token} />} />
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/myorders" element={<MyOrders token={token} />} />
-            
+            <Route path="/category/:categoryName" element={<CategoryPage />} />
+
           </Routes>
         </div>
 

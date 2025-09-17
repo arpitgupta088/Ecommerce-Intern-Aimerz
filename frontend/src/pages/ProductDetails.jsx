@@ -11,6 +11,7 @@ export default function ProductDetails() {
 
   useEffect(() => {
     const fetchProduct = async () => {
+      // 🔹 Dummy products (local data)
       let found = productsData.find((p) => String(p.id) === String(id));
       if (found) {
         setProduct(found);
@@ -18,11 +19,12 @@ export default function ProductDetails() {
         return;
       }
 
+      // 🔹 Backend products
       try {
         const res = await axios.get(`http://localhost:5000/api/products/${id}`);
         setProduct(res.data);
       } catch (err) {
-        console.error("Error fetching product details", err);
+        console.error("❌ Error fetching product details:", err);
       } finally {
         setLoading(false);
       }
@@ -33,7 +35,7 @@ export default function ProductDetails() {
 
   const handleAddToCart = async () => {
     try {
-      // Dummy product ka case
+      // 🔹 Dummy product ka case
       if (!product._id && product.id) {
         let localCart = JSON.parse(localStorage.getItem("localCart")) || [];
         const exists = localCart.find((item) => item.id === product.id);
@@ -45,22 +47,24 @@ export default function ProductDetails() {
         }
 
         localStorage.setItem("localCart", JSON.stringify(localCart));
-        alert(" Item added to cart (dummy)");
+        console.log("🟢 Local Cart Updated:", localCart);
+        alert("✅ Item added to cart (dummy)");
         return;
       }
 
-      // DB product ka case
+      // 🔹 DB product ka case
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Please login to add items to cart!");
+        alert("⚠️ Please login to add items to cart!");
         return;
       }
 
-      await addToCart(product._id, 1, token);
-      alert(" Item added to cart (DB)");
+      const res = await addToCart(product._id, 1, token);
+      console.log("🟢 AddToCart API Response:", res);
+      alert("✅ Item added to cart (DB)");
     } catch (err) {
-      console.error(err);
-      alert(" Failed to add item to cart.");
+      console.error("❌ AddToCart Error:", err.response?.data || err.message);
+      alert("❌ Failed to add item to cart.");
     }
   };
 
