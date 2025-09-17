@@ -23,7 +23,7 @@ const seedProducts = async () => {
       {
         name: "OnePlus Nord",
         price: 29999,
-        image: "",
+        image: "xyz",
       },
     ]);
     console.log("Products Seeded");
