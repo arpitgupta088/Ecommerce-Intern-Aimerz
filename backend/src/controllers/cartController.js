@@ -1,10 +1,9 @@
 const Cart = require("../models/Cart");
-const Product = require("../models/Product");
 
 // Get cart of logged-in user
 exports.getCart = async (req, res) => {
   try {
-    const cart = await Cart.findOne({ user: req.user.id }).populate("items.product");
+    const cart = await Cart.findOne({ user: req.user.id });
     if (!cart) return res.json({ items: [] });
     res.json(cart);
   } catch (err) {
@@ -15,9 +14,10 @@ exports.getCart = async (req, res) => {
 // Add item to cart
 exports.addToCart = async (req, res) => {
   try {
-    const { productId, quantity } = req.body;
-    if(!productId){
-      return res.status(400).json({message:" Product ID is required"});
+    const { id, name, price, image, quantity } = req.body;
+
+    if (!id || !name) {
+      return res.status(400).json({ message: "Product data is required" });
     }
 
     let cart = await Cart.findOne({ user: req.user.id });
@@ -25,18 +25,24 @@ exports.addToCart = async (req, res) => {
       cart = new Cart({ user: req.user.id, items: [] });
     }
 
-    const itemIndex = cart.items.findIndex(i => i.product.toString() === productId);
+    // check agar product already cart me hai
+    const itemIndex = cart.items.findIndex(i => i.productId === id);
 
     if (itemIndex > -1) {
       cart.items[itemIndex].quantity += quantity || 1;
     } else {
-      cart.items.push({ product: productId, quantity: quantity || 1 });
+      cart.items.push({
+        productId: id,
+        name,
+        price,
+        image,
+        quantity: quantity || 1,
+      });
     }
 
     await cart.save();
-    await cart.populate("items.product"); 
 
-    console.log("saved cart", cart);
+    console.log("Cart saved:", cart);
     res.status(201).json(cart);
   } catch (err) {
     console.error("Error in addToCart:", err);
@@ -44,17 +50,17 @@ exports.addToCart = async (req, res) => {
   }
 };
 
-//  Remove item
+
+// Remove item
 exports.removeFromCart = async (req, res) => {
   try {
-    const { productId } = req.body;
+    const { productId } = req.body; // dummy productId bhejna hoga
     let cart = await Cart.findOne({ user: req.user.id });
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
-    cart.items = cart.items.filter(i => i.product.toString() !== productId);
+    cart.items = cart.items.filter(i => i.productId !== productId);
 
     await cart.save();
-    await cart.populate("items.product");
     res.json(cart);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -68,12 +74,11 @@ exports.updateQuantity = async (req, res) => {
     let cart = await Cart.findOne({ user: req.user.id });
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
-    const itemIndex = cart.items.findIndex(i => i.product.toString() === productId);
+    const itemIndex = cart.items.findIndex(i => i.productId === productId);
     if (itemIndex === -1) return res.status(404).json({ message: "Item not in cart" });
 
     cart.items[itemIndex].quantity = quantity;
     await cart.save();
-    await cart.populate("items.product");
 
     res.json(cart);
   } catch (err) {

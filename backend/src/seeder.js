@@ -13,7 +13,7 @@ const seedProducts = async () => {
         name: "Samsung Galaxy M30s",
         price: 13999,
         image:
-          "https://www.xparts.in/wp-content/uploads/2024/12/Samsung-Galaxy-M30s-Back-Housing-3-1-600x600.png",
+          "https://5.imimg.com/data5/TR/GT/EI/SELLER-83754626/samsung-galaxy-m30s.jpeg",
       },
       {
         name: "iPhone 14",
