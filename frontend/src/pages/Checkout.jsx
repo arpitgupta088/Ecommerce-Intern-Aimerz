@@ -69,25 +69,34 @@ export default function Checkout({ token }) {
 
   // ----------------- PLACE ORDER -----------------
   const handlePlaceOrder = async () => {
-    if (!shippingAddress.fullName || !shippingAddress.address) {
-      alert("Please fill in shipping details");
-      return;
-    }
+  if (!shippingAddress.fullName || !shippingAddress.address) {
+    alert("Please fill in shipping details");
+    return;
+  }
 
-    try {
-      const order = await placeOrderApi({ paymentMethod, shippingAddress }, token);
-      alert("✅ Order placed successfully!");
-      console.log("Order Details:", order);
+  try {
+    const order = await placeOrderApi(
+      {
+        paymentMethod,
+        shippingAddress,
+        items: cart.items 
+      },
+      token
+    );
 
-      // Update cart after placing order
-      fetchCartData();
+    alert("Order placed successfully!");
+    console.log("Order Details:", order);
 
-      navigate("/myorders"); // optional navigation
-    } catch (err) {
-      console.error("❌ Failed to place order:", err);
-      alert("Failed to place order");
-    }
-  };
+    localStorage.removeItem("localCart");
+
+    fetchCartData();
+
+    navigate("/myorders");
+  } catch (err) {
+    console.error("Failed to place order:", err);
+    alert("Failed to place order");
+  }
+};
 
   if (!cart.items || cart.items.length === 0) return <p>Your cart is empty.</p>;
 

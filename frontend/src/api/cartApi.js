@@ -1,12 +1,19 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/cart";  
+const CART_API_URL = "http://localhost:5000/api/cart";
+const ORDER_API_URL = "http://localhost:5000/api/orders";
 
 // Add product to cart
-export const addToCart = async (productId, quantity = 1, token) => {
+export const addToCart = async (product, token) => {
   const res = await axios.post(
-    `${API_URL}/add`,
-    { productId, quantity },
+    "http://localhost:5000/api/cart",
+    {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1,
+    },
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -14,45 +21,34 @@ export const addToCart = async (productId, quantity = 1, token) => {
   return res.data;
 };
 
+
 // Get user cart
 export const getCart = async (token) => {
-  const res = await axios.get(API_URL, {
+  const res = await axios.get(CART_API_URL, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
 };
 
-// Remove product from cart (backend)
+// Remove product from cart
 export const removeFromCart = async (productId, token) => {
-  const res = await axios.delete(`${API_URL}/remove/${productId}`, {
+  const res = await axios.delete(CART_API_URL, {
     headers: { Authorization: `Bearer ${token}` },
+    data: { productId },
   });
   return res.data;
 };
 
-// ------------- Place Order (Dummy) ---
-export const placeOrder = async ({ paymentMethod, shippingAddress }, token) => {
-  // Get current cart from localStorage
-  const localCart = JSON.parse(localStorage.getItem("localCart")) || [];
+// Place Order
+export const placeOrder = async ({ paymentMethod, shippingAddress, items }, token) => {
+  const res = await axios.post(
+    ORDER_API_URL,
+    { paymentMethod, shippingAddress, items },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 
-  if (localCart.length === 0) {
-    throw new Error("Cart is empty");
-  }
-
-  // Create dummy order object
-  const order = {
-    id: Date.now(), 
-    items: localCart,
-    paymentMethod,
-    shippingAddress,
-    status: "placed",
-    placedAt: new Date().toISOString(),
-  };
-
-  console.log("✅ Order Placed:", order);
-
-  // local cart clear krna
-  localStorage.removeItem("localCart");
-
-  return order;
+  console.log("Order Saved to DB:", res.data);
+  return res.data;
 };

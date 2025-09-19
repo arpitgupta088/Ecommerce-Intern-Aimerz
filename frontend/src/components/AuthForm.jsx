@@ -29,7 +29,7 @@ function AuthForm() {
           password,
           role,
         });
-console.log("Login response:", res.data);
+// console.log("Login response:", res.data);
 
         localStorage.setItem("token", res.data.token);
         console.log("Token saved:", res.data.token);

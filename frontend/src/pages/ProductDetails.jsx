@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from "react"; 
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import productsData from "../data/products";
@@ -8,10 +8,10 @@ export default function ProductDetails() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const role = localStorage.getItem("role"); // added
 
   useEffect(() => {
     const fetchProduct = async () => {
-      // Dummy products (local data)
       let found = productsData.find((p) => String(p.id) === String(id));
       if (found) {
         setProduct(found);
@@ -19,7 +19,6 @@ export default function ProductDetails() {
         return;
       }
 
-      // Backend products
       try {
         const res = await axios.get(`http://localhost:5000/api/products/${id}`);
         setProduct(res.data);
@@ -34,8 +33,9 @@ export default function ProductDetails() {
   }, [id]);
 
   const handleAddToCart = async () => {
+    if (role === "admin") return; // Admin cannot add to cart
+
     try {
-      // Dummy product case
       if (!product._id && product.id) {
         let localCart = JSON.parse(localStorage.getItem("localCart")) || [];
         const exists = localCart.find((item) => item.id === product.id);
@@ -47,12 +47,10 @@ export default function ProductDetails() {
         }
 
         localStorage.setItem("localCart", JSON.stringify(localCart));
-        console.log("Local Cart Updated:", localCart);
-        alert("Item added to cart (dummy)");
+        alert("Item added to cart");
         return;
       }
 
-      // DB product case
       const token = localStorage.getItem("token");
       if (!token) {
         alert("Please login to add items to cart!");
@@ -60,8 +58,7 @@ export default function ProductDetails() {
       }
 
       const res = await addToCart(product._id, 1, token);
-      console.log("AddToCart API Response:", res);
-      alert("Item added to cart (DB)");
+      alert("Item added to cart");
     } catch (err) {
       console.error("AddToCart Error:", err.response?.data || err.message);
       alert("Failed to add item to cart.");
@@ -93,15 +90,19 @@ export default function ProductDetails() {
             ₹{product.price}
           </p>
           <p className="mb-6 text-gray-700">
-            {product.description ||
-              "Experience the best quality and latest technology with this amazing gadget. Perfect for your needs and lifestyle."}
+            {product.description || "Experience the best quality and latest technology with this amazing gadget. Perfect for your needs and lifestyle."}
           </p>
-          <button
-            onClick={handleAddToCart}
-            className="btn btn-primary px-8 py-3 text-lg rounded-full shadow-lg hover:scale-105 hover:bg-blue-700 transition-all duration-200"
-          >
-            Add to Cart
-          </button>
+
+          {/* Only show for customer */}
+          {role !== "admin" && (
+            <button
+              onClick={handleAddToCart}
+              className="btn btn-primary px-8 py-3 text-lg rounded-full shadow-lg hover:scale-105 hover:bg-blue-700 transition-all duration-200"
+            >
+              Add to Cart
+            </button>
+          )}
+
           <div className="mt-8">
             <h2 className="font-semibold text-lg mb-2 text-blue-700">
               Product Details

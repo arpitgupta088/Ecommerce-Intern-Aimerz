@@ -12,8 +12,17 @@ import Footer from "./components/Footer";
 import MyOrders from "./pages/MyOrders";
 import CategoryPage from "./pages/CategoryPage";
 
+// Admin Components
+import AdminDashboard from "./components/AdminDashboard";
+import ProductListAdmin from "./components/ProductListAdmin";
+import AddProduct from "./components/AddProduct";
+import EditProduct from "./components/EditProduct";
+import OrderListAdmin from "./components/OrderListAdmin";
+
 function App() {
-  const token = localStorage.getItem("token"); 
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -36,7 +45,7 @@ function App() {
               }
             />
 
-            {/* Login Page */}
+            {/* Customer Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout token={token} />} />
@@ -44,10 +53,20 @@ function App() {
             <Route path="/myorders" element={<MyOrders token={token} />} />
             <Route path="/category/:categoryName" element={<CategoryPage />} />
 
+            {/* Admin Routes */}
+            {token && role === "admin" && (
+              <>
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/products" element={<ProductListAdmin />} />
+                <Route path="/admin/products/new" element={<AddProduct />} />
+                <Route path="/admin/products/edit/:id" element={<EditProduct />} />
+                <Route path="/admin/orders" element={<OrderListAdmin />} />
+              </>
+            )}
           </Routes>
         </div>
 
-        <Footer /> 
+        <Footer />
       </div>
     </Router>
   );

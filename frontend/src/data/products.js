@@ -23,33 +23,59 @@ const products = [
   },
   {
     id: 4,
-    name: "Dell XPS 15 Laptop",
-    price: 119999,
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8"
+    name: "One Plus Nord",
+    price: 24999,
+    category: "Mobiles",
+    image: "https://m.media-amazon.com/images/I/61RdG7c+VUL.jpg"
   },
   {
     id: 5,
-    name: "Apple Watch Series 9",
-    price: 41999,
-    image: "https://www.aptronixindia.com/media/catalog/product/cache/31f0162e6f7d821d2237f39577122a8a/g/o/gold_stainless_steel_gold_milanese_loop_pdp_image_position-1__en-us.jpeg"
+    name: "iphone 14",
+    price: 49999,
+    category: "Mobiles",
+    image: "https://easyphones.co.in/cdn/shop/files/Apple_iPhone_14_pro_Max_-_Refurbished_White.png?v=1755513244"
   },
   {
     id: 6,
-    name: "Canon EOS 1500D DSLR Camera",
-    price: 35999,
-    image: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308"
+    name: "Apple Watch Series 9",
+    price: 41999,
+    category: "Accessories",
+    image: "https://www.aptronixindia.com/media/catalog/product/cache/31f0162e6f7d821d2237f39577122a8a/g/o/gold_stainless_steel_gold_milanese_loop_pdp_image_position-1__en-us.jpeg"
   },
   {
     id: 7,
-    name: "Bose SoundLink Revolve+ Bluetooth Speaker",
-    price: 19999,
-    image: "https://img.tatacliq.com/images/i19//1348Wx2000H/MP000000023561136_1348Wx2000H_202409070049242.jpeg"
+    name: "Canon EOS 1500D DSLR Camera",
+    price: 35999,
+    category: "Accessories",
+    image: "https://www.jiomart.com/images/product/original/491362608/canon-eos-1500d-dslr-camera-with-18-55-mm-lens-kit-digital-o491362608-p590441094-0-202108121733.jpeg?im=Resize=(420,420)"
   },
   {
     id: 8,
+    name: "Bose SoundLink Revolve+ Bluetooth Speaker",
+    price: 19999,
+    category: "Audio",
+    image: "https://img.tatacliq.com/images/i19//1348Wx2000H/MP000000023561136_1348Wx2000H_202409070049242.jpeg"
+  },
+  {
+    id: 9,
     name: "Samsung 27-inch Curved Monitor",
     price: 17999,
+      category: "Accessories",
     image: "https://www.primeabgb.com/wp-content/uploads/2023/10/Samsung-27-inch-Curved-Full-HD-Monitor-with-1800R-1.jpg"
+  },
+  {
+    id: 10,
+    name: "HP Pavilion Gaming Laptop",
+    price: 102999,
+    category: "Laptops",
+    image: "https://ehpworld.com/wp-content/uploads/2021/10/HP-Pavilion-Gaming-Laptop-15-DK2100TX.png"
+  },
+  {
+    id: 11,
+    name: "Dell XPS 15 Laptop",
+    price: 119999,
+    category: "Laptops",
+    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8"
   }
 ];
 
